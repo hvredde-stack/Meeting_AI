@@ -16,7 +16,7 @@ import config
 GROQ_API_KEY = config.GROQ_API_KEY
 ASSEMBLYAI_API_KEY = config.ASSEMBLYAI_API_KEY
 
-AI_MODEL = "openai/gpt-oss-20b"
+AI_MODEL = "llama-3.3-70b-versatile"
 
 HOTKEY = '<ctrl>+<alt>+h'
 
@@ -231,15 +231,15 @@ def update_display():
             display_index = 0
             text_widget.delete(1.0, tk.END)
 
-        # Typewriter effect: display one character at a time
+        # Typewriter effect: display in chunks for speed
         if display_index < len(text_to_display):
-            # Check if user is already at the bottom before adding text
             should_autoscroll = text_widget.yview()[1] >= 0.99
+            
+            chunk_size = 3
+            chunk = text_to_display[display_index : display_index + chunk_size]
+            text_widget.insert(tk.END, chunk)
+            display_index += len(chunk)
 
-            text_widget.insert(tk.END, text_to_display[display_index])
-            display_index += 1
-
-            # Only auto-scroll if the user was at the bottom
             if should_autoscroll:
                 text_widget.see(tk.END)
 
@@ -249,7 +249,7 @@ def update_display():
         print(f"[GUI ERROR] Failed to update display: {e}")
     
     # Reschedule the update
-    root.after(20, update_display)
+    root.after(10, update_display)
 
 # ========================
 # Launch
@@ -258,7 +258,7 @@ def update_display():
 threading.Thread(target=websocket_stream, daemon=True).start()
 threading.Thread(target=start_hotkey_listener, daemon=True).start()
 
-root.after(20, update_display)
+root.after(10, update_display)
 print("Stealth Copilot launched! • Drag • Ctrl+Alt+H to hide\n")
 
 root.mainloop()
