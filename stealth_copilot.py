@@ -243,7 +243,7 @@ def update_display():
         print(f"[GUI ERROR] Failed to update display: {e}")
     
     # Reschedule the update
-    root.after(50, update_display)
+    root.after(20, update_display)
 
 # ========================
 # Launch
@@ -252,7 +252,7 @@ def update_display():
 threading.Thread(target=websocket_stream, daemon=True).start()
 threading.Thread(target=start_hotkey_listener, daemon=True).start()
 
-root.after(50, update_display)
+root.after(20, update_display)
 print("Stealth Copilot launched! • Drag • Ctrl+Alt+H to hide\n")
 
 root.mainloop()
