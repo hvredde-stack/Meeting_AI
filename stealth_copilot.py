@@ -16,7 +16,7 @@ import config
 GROQ_API_KEY = config.GROQ_API_KEY
 ASSEMBLYAI_API_KEY = config.ASSEMBLYAI_API_KEY
 
-AI_MODEL = "llama-3.3-70b-versatile"
+AI_MODEL = "GPT OSS 20B 128k"
 
 HOTKEY = '<ctrl>+<alt>+h'
 
