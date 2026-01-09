@@ -214,6 +214,7 @@ root.title("Stealth Copilot")
 root.configure(bg=BACKGROUND_COLOR)
 root.attributes("-topmost", True)
 root.attributes("-alpha", WINDOW_OPACITY)
+root.attributes("-transparentcolor", BACKGROUND_COLOR)
 root.overrideredirect(True)
 root.geometry(f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}+100+100")
 
