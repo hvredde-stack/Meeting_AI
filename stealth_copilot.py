@@ -36,11 +36,13 @@ RATE = 16000
 # Globals
 # ========================
 
-response_queue = queue.Queue()
+answer_queue = queue.Queue()
 window_visible = True
 root = None
 current_interim = ""
 ws = None
+text_to_display = ""
+display_index = 0
 
 # ========================
 # Groq response
@@ -89,7 +91,7 @@ def on_message(ws, message):
                 full = (current_interim + " " + transcript).strip()
                 print(f"\n[DEBUG] Final question detected: {full}\n")
                 if len(full) > 20:
-                    response_queue.put(get_ai_response(full))
+                    answer_queue.put(get_ai_response(full))
                 current_interim = ""
             else:
                 current_interim = transcript
@@ -121,7 +123,7 @@ def websocket_stream():
     global ws
     try:
         # Adjusted URL to make the end-of-turn detection less sensitive (waits for a longer pause)
-        url = f"wss://streaming.assemblyai.com/v3/ws?sample_rate={RATE}&format_turns=true&end_of_turn_threshold_ms=1500"
+        url = f"wss://streaming.assemblyai.com/v3/ws?sample_rate={RATE}&format_turns=true&end_of_turn_threshold_ms=3000"
 
         ws = websocket.WebSocketApp(
             url,
@@ -218,21 +220,30 @@ root.bind("<B1-Motion>", drag)
 text_widget = tk.Text(root, bg=BACKGROUND_COLOR, fg=TEXT_COLOR, font=("Consolas", FONT_SIZE),
                       wrap=tk.WORD, padx=20, pady=20, relief=tk.FLAT)
 text_widget.pack(fill=tk.BOTH, expand=True)
-text_widget.insert(tk.END, "Stealth Copilot Ready (Raw WebSocket + Groq)\nWaiting for question...\n")
+text_widget.insert(tk.END, "Stealth Copilot is active. Listening for questions via VB-Cable...\n")
 
 def update_display():
+    global text_to_display, display_index
     try:
-        while not response_queue.empty():
-            answer = response_queue.get_nowait()
-            print(f"[GUI] Updating display with Groq response:\n---\n{answer}\n---")
+        # Check if there's a new answer to display
+        if not answer_queue.empty():
+            text_to_display = answer_queue.get_nowait()
+            display_index = 0
             text_widget.delete(1.0, tk.END)
-            text_widget.insert(tk.END, answer + "\n")
+
+        # Typewriter effect: display one character at a time
+        if display_index < len(text_to_display):
+            text_widget.insert(tk.END, text_to_display[display_index])
+            display_index += 1
             text_widget.see(tk.END)
+
     except queue.Empty:
         pass  # This is expected when the queue is empty
     except Exception as e:
         print(f"[GUI ERROR] Failed to update display: {e}")
-    root.after(300, update_display)
+    
+    # Reschedule the update
+    root.after(50, update_display)
 
 # ========================
 # Launch
@@ -241,7 +252,7 @@ def update_display():
 threading.Thread(target=websocket_stream, daemon=True).start()
 threading.Thread(target=start_hotkey_listener, daemon=True).start()
 
-root.after(300, update_display)
+root.after(50, update_display)
 print("Stealth Copilot launched! • Drag • Ctrl+Alt+H to hide\n")
 
 root.mainloop()
