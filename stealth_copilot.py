@@ -223,10 +223,23 @@ root.geometry(f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}+100+100")
 if sys.platform == "win32":
     try:
         hwnd = root.winfo_id()
-        # Use SetWindowDisplayAffinity for more robust screen capture prevention
+
+        # Technique 1: Set Display Affinity to exclude from capture
         WDA_EXCLUDEFROMCAPTURE = 0x00000011
         ctypes.windll.user32.SetWindowDisplayAffinity(hwnd, WDA_EXCLUDEFROMCAPTURE)
         print("[INFO] Advanced stealth mode (WDA_EXCLUDEFROMCAPTURE) activated.")
+
+        # Technique 2: Set window style to be a tool window (no taskbar icon)
+        GWL_EXSTYLE = -20
+        WS_EX_APPWINDOW = 0x00040000
+        WS_EX_TOOLWINDOW = 0x00000080
+        style = ctypes.windll.user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
+        style = (style & ~WS_EX_APPWINDOW) | WS_EX_TOOLWINDOW
+        ctypes.windll.user32.SetWindowLongW(hwnd, GWL_EXSTYLE, style)
+        print("[INFO] Tool window style set for stealth.")
+
+        # Re-assert topmost attribute after style change
+        root.attributes("-topmost", True)
     except Exception as e:
         print(f"[ERROR] Failed to activate stealth mode: {e}")
 
