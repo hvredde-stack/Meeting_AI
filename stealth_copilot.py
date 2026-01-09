@@ -233,9 +233,15 @@ def update_display():
 
         # Typewriter effect: display one character at a time
         if display_index < len(text_to_display):
+            # Check if user is already at the bottom before adding text
+            should_autoscroll = text_widget.yview()[1] >= 0.99
+
             text_widget.insert(tk.END, text_to_display[display_index])
             display_index += 1
-            text_widget.see(tk.END)
+
+            # Only auto-scroll if the user was at the bottom
+            if should_autoscroll:
+                text_widget.see(tk.END)
 
     except queue.Empty:
         pass  # This is expected when the queue is empty
