@@ -52,6 +52,16 @@ display_index = 0
 
 def get_ai_response(transcript):
     print(f"[DEBUG] Sending to Groq: {transcript[:100]}...")
+    
+    system_prompt = (
+        "You are an expert interview coach. Your task is to provide a clear, concise, and professional response "
+        "to the user's question, as if you were the one being interviewed. Frame your answer in the first person "
+        "(e.g., 'I would...', 'I believe...', 'In my experience...'). The response should be well-structured, "
+        "confident, and directly address the question. Avoid generic statements and focus on providing "
+        "actionable, impressive answers that a top-tier candidate would give. Use natural language and a "
+        "conversational yet professional tone. Do not use bullet points; provide the answer as a short, speakable paragraph."
+    )
+    
     headers = {
         "Authorization": f"Bearer {GROQ_API_KEY}",
         "Content-Type": "application/json"
@@ -59,7 +69,7 @@ def get_ai_response(transcript):
     payload = {
         "model": AI_MODEL,
         "messages": [
-            {"role": "system", "content": "Expert interview coach. Concise, natural bullet-point answers the candidate can say confidently."},
+            {"role": "system", "content": system_prompt},
             {"role": "user", "content": f"Question: {transcript}"}
         ],
         "max_tokens": 400,
@@ -211,15 +221,10 @@ root.geometry(f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}+100+100")
 if sys.platform == "win32":
     try:
         hwnd = root.winfo_id()
-        GWL_EXSTYLE = -20
-        WS_EX_APPWINDOW = 0x00040000
-        WS_EX_TOOLWINDOW = 0x00000080
-        style = ctypes.windll.user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
-        style = (style & ~WS_EX_APPWINDOW) | WS_EX_TOOLWINDOW
-        ctypes.windll.user32.SetWindowLongW(hwnd, GWL_EXSTYLE, style)
-        # Re-assert topmost attribute after style change
-        root.attributes("-topmost", True)
-        print("[INFO] Stealth mode activated for Windows.")
+        # Use SetWindowDisplayAffinity for more robust screen capture prevention
+        WDA_EXCLUDEFROMCAPTURE = 0x00000011
+        ctypes.windll.user32.SetWindowDisplayAffinity(hwnd, WDA_EXCLUDEFROMCAPTURE)
+        print("[INFO] Advanced stealth mode (WDA_EXCLUDEFROMCAPTURE) activated.")
     except Exception as e:
         print(f"[ERROR] Failed to activate stealth mode: {e}")
 
