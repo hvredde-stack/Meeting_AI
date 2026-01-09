@@ -7,6 +7,8 @@ import pyaudio
 import websocket
 import json
 import requests
+import sys
+import ctypes
 
 # ========================
 # API Keys
@@ -204,6 +206,23 @@ root.attributes("-topmost", True)
 root.attributes("-alpha", WINDOW_OPACITY)
 root.overrideredirect(True)
 root.geometry(f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}+100+100")
+
+# --- Make window stealthy on Windows ---
+if sys.platform == "win32":
+    try:
+        hwnd = root.winfo_id()
+        GWL_EXSTYLE = -20
+        WS_EX_APPWINDOW = 0x00040000
+        WS_EX_TOOLWINDOW = 0x00000080
+        style = ctypes.windll.user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
+        style = (style & ~WS_EX_APPWINDOW) | WS_EX_TOOLWINDOW
+        ctypes.windll.user32.SetWindowLongW(hwnd, GWL_EXSTYLE, style)
+        # Re-assert topmost attribute after style change
+        root.attributes("-topmost", True)
+        print("[INFO] Stealth mode activated for Windows.")
+    except Exception as e:
+        print(f"[ERROR] Failed to activate stealth mode: {e}")
+
 
 def start_drag(e): root.x = e.x; root.y = e.y
 def stop_drag(e): root.x = None; root.y = None
