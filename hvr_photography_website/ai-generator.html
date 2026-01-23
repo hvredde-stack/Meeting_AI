@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="AI Image Generator - Create photography concepts and visualize your dream photoshoot with AI-powered image generation.">
+    <title>AI Image Generator | HVR Photography Studio</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap"
+        rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        .generator-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+        }
+
+        .generator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .generator-panel {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .preset-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .preset-btn {
+            padding: 1rem;
+            border: 2px solid var(--light-gray);
+            background: var(--white);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            font-family: var(--font-body);
+            font-weight: 500;
+        }
+
+        .preset-btn:hover {
+            border-color: var(--primary-burgundy);
+            background: var(--secondary-cream);
+        }
+
+        .preset-btn.active {
+            border-color: var(--primary-burgundy);
+            background: var(--primary-burgundy);
+            color: var(--white);
+        }
+
+        .generated-image-container {
+            width: 100%;
+            aspect-ratio: 1;
+            background: var(--light-gray);
+            border-radius: var(--border-radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .generated-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .placeholder-text {
+            text-align: center;
+            color: var(--medium-gray);
+            padding: 2rem;
+        }
+
+        .example-prompts {
+            background: var(--secondary-cream);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-top: 1.5rem;
+        }
+
+        .example-prompt {
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-size: 0.9rem;
+        }
+
+        .example-prompt:hover {
+            background: var(--primary-burgundy);
+            color: var(--white);
+        }
+
+        @media (max-width: 968px) {
+            .generator-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="logo.png" alt="HVR Photography Logo" style="height: 60px; width: auto;">
+            </a>
+
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html#home" class="nav-link">Home</a></li>
+                <li><a href="index.html#about" class="nav-link">About</a></li>
+                <li><a href="index.html#services" class="nav-link">Services</a></li>
+                <li><a href="index.html#gallery" class="nav-link">Gallery</a></li>
+                <li><a href="index.html#tools" class="nav-link active">Interactive Tools</a></li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="generator-container">
+        <h1 class="text-center">AI Image Generator</h1>
+        <p class="text-center" style="max-width: 700px; margin: 1rem auto 0; color: var(--medium-gray);">
+            Visualize your dream photoshoot! Describe your photography concept and let AI generate sample images to
+            inspire your session.
+        </p>
+
+        <div class="generator-grid">
+            <!-- Input Panel -->
+            <div class="generator-panel">
+                <h3>Create Your Vision</h3>
+
+                <div class="form-group">
+                    <label for="promptInput" class="form-label">Describe Your Photoshoot Concept</label>
+                    <textarea id="promptInput" class="form-textarea"
+                        placeholder="Example: Elegant maternity photoshoot in golden hour, flowing cream dress, natural outdoor setting..."
+                        rows="4"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Photography Style Presets</label>
+                    <div class="preset-buttons">
+                        <button class="preset-btn" data-style="traditional">
+                            <i class="fas fa-palette"></i> Traditional
+                        </button>
+                        <button class="preset-btn" data-style="modern">
+                            <i class="fas fa-camera-retro"></i> Modern
+                        </button>
+                        <button class="preset-btn" data-style="vintage">
+                            <i class="fas fa-film"></i> Vintage
+                        </button>
+                        <button class="preset-btn" data-style="cinematic">
+                            <i class="fas fa-video"></i> Cinematic
+                        </button>
+                    </div>
+                </div>
+
+                <button id="generateBtn" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                    <i class="fas fa-magic"></i> Generate Image
+                </button>
+
+                <div class="example-prompts">
+                    <strong style="display: block; margin-bottom: 0.5rem;">Example Prompts (Click to Use):</strong>
+                    <div class="example-prompt"
+                        data-prompt="Elegant South Asian bride in vibrant red and gold traditional saree, professional studio lighting, rich warm tones">
+                        🌟 Traditional Bridal Portrait
+                    </div>
+                    <div class="example-prompt"
+                        data-prompt="Beautiful outdoor maternity photoshoot, golden hour sunset, flowing dress, natural greenery background">
+                        🤰 Maternity Golden Hour
+                    </div>
+                    <div class="example-prompt"
+                        data-prompt="Traditional house warming ceremony, vibrant decorations, family gathering, warm indoor lighting, cultural celebration">
+                        🏠 House Warming Event
+                    </div>
+                    <div class="example-prompt"
+                        data-prompt="Romantic couple portrait, outdoor setting, soft natural light, candid moments, warm tones">
+                        💑 Couple Session
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output Panel -->
+            <div class="generator-panel">
+                <h3>Generated Image</h3>
+
+                <div class="generated-image-container" id="imageContainer">
+                    <div class="placeholder-text">
+                        <i class="fas fa-image"
+                            style="font-size: 4rem; color: var(--light-gray); margin-bottom: 1rem;"></i>
+                        <p>Your generated image will appear here</p>
+                        <p style="font-size: 0.9rem;">Enter a prompt and click "Generate Image"</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1.5rem; display: none;" id="imageActions">
+                    <button id="downloadBtn" class="btn btn-secondary" style="width: 100%; margin-bottom: 0.75rem;">
+                        <i class="fas fa-download"></i> Download Image
+                    </button>
+                    <button id="shareBtn" class="btn btn-outline" style="width: 100%;">
+                        <i class="fas fa-share-alt"></i> Share
+                    </button>
+                </div>
+
+                <div
+                    style="margin-top: 1.5rem; padding: 1.5rem; background: var(--secondary-cream); border-radius: var(--border-radius);">
+                    <h4 style="margin-bottom: 1rem;">💡 Tips for Best Results</h4>
+                    <ul style="margin-left: 1.5rem; color: var(--medium-gray);">
+                        <li>Be specific about lighting (golden hour, studio, natural)</li>
+                        <li>Mention clothing and colors</li>
+                        <li>Describe the setting and mood</li>
+                        <li>Include photography style preferences</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 4rem;">
+            <p style="color: var(--medium-gray); margin-bottom: 1rem;">Love what you see? Let's make it real!</p>
+            <a href="index.html#contact" class="btn btn-primary">Book Your Photoshoot</a>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // AI Image Generator Logic
+        const promptInput = document.getElementById('promptInput');
+        const generateBtn = document.getElementById('generateBtn');
+        const imageContainer = document.getElementById('imageContainer');
+        const imageActions = document.getElementById('imageActions');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const shareBtn = document.getElementById('shareBtn');
+        const presetBtns = document.querySelectorAll('.preset-btn');
+        const examplePrompts = document.querySelectorAll('.example-prompt');
+
+        let selectedStyle = '';
+        let currentImageUrl = '';
+
+        // Preset style selection
+        presetBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                presetBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                selectedStyle = this.dataset.style;
+            });
+        });
+
+        // Example prompt selection
+        examplePrompts.forEach(prompt => {
+            prompt.addEventListener('click', function () {
+                promptInput.value = this.dataset.prompt;
+            });
+        });
+
+        // Generate image
+        generateBtn.addEventListener('click', async function () {
+            const prompt = promptInput.value.trim();
+
+            if (!prompt) {
+                alert('Please enter a description for your photoshoot concept!');
+                return;
+            }
+
+            // Show loading state
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<span class="loading"></span> Generating...';
+            imageContainer.innerHTML = `
+                <div class="placeholder-text">
+                    <div class="loading" style="width: 60px; height: 60px; border-width: 5px; margin: 0 auto 1rem;"></div>
+                    <p>Creating your image...</p>
+                    <p style="font-size: 0.9rem;">This may take a few moments</p>
+                </div>
+            `;
+
+            try {
+                // Add style to prompt if selected
+                let fullPrompt = prompt;
+                if (selectedStyle) {
+                    fullPrompt += `, ${selectedStyle} photography style`;
+                }
+                fullPrompt += ', professional photography, high quality, detailed';
+
+                // Simulate API call (in production, call actual AI image generation API)
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // For demo, use a placeholder or previously generated image
+                // In production, you would call an API like:
+                // const response = await fetch('https://api.openai.com/v1/images/generations', {...});
+
+                // Demo: Show a sample image based on keywords
+                let demoImage = 'C:/Users/hvred/.gemini/antigravity/brain/de16bb1c-e07b-45b6-9fe0-368af7a4f503/hero_background_1769162282652.png';
+
+                if (prompt.toLowerCase().includes('maternity')) {
+                    demoImage = 'C:/Users/hvred/.gemini/antigravity/brain/de16bb1c-e07b-45b6-9fe0-368af7a4f503/maternity_sample_1769162296588.png';
+                } else if (prompt.toLowerCase().includes('house') || prompt.toLowerCase().includes('event')) {
+                    demoImage = 'C:/Users/hvred/.gemini/antigravity/brain/de16bb1c-e07b-45b6-9fe0-368af7a4f503/event_sample_1769162312984.png';
+                }
+
+                currentImageUrl = demoImage;
+
+                // Display generated image
+                imageContainer.innerHTML = `<img src="${demoImage}" alt="Generated photography concept">`;
+                imageActions.style.display = 'block';
+
+                // Track event
+                if (typeof trackEvent === 'function') {
+                    trackEvent('AI Generator', 'Generate', prompt.substring(0, 50));
+                }
+
+            } catch (error) {
+                console.error('Error generating image:', error);
+                imageContainer.innerHTML = `
+                    <div class="placeholder-text">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--accent-orange); margin-bottom: 1rem;"></i>
+                        <p>Oops! Something went wrong.</p>
+                        <p style="font-size: 0.9rem;">Please try again</p>
+                    </div>
+                `;
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '<i class="fas fa-magic"></i> Generate Image';
+            }
+        });
+
+        // Download image
+        downloadBtn.addEventListener('click', function () {
+            if (currentImageUrl) {
+                const link = document.createElement('a');
+                link.href = currentImageUrl;
+                link.download = 'hvr-photography-concept.png';
+                link.click();
+
+                if (typeof trackEvent === 'function') {
+                    trackEvent('AI Generator', 'Download', 'Image');
+                }
+            }
+        });
+
+        // Share image
+        shareBtn.addEventListener('click', async function () {
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'My Photography Concept - HVR Photography',
+                        text: 'Check out this photography concept I created!',
+                        url: window.location.href
+                    });
+                } catch (error) {
+                    console.log('Error sharing:', error);
+                }
+            } else {
+                alert('Sharing is not supported on this browser. You can download the image instead!');
+            }
+
+            if (typeof trackEvent === 'function') {
+                trackEvent('AI Generator', 'Share', 'Image');
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Book a virtual consultation with HVR Photography Studio - Schedule your free consultation to discuss your photography needs.">
+    <title>Book Consultation | HVR Photography Studio</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap"
+        rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        .booking-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+        }
+
+        .booking-card {
+            background: var(--white);
+            padding: 3rem;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--light-gray);
+            z-index: 0;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--light-gray);
+            color: var(--medium-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            transition: all var(--transition-base);
+        }
+
+        .step.active .step-number {
+            background: var(--gradient-primary);
+            color: var(--white);
+        }
+
+        .step.completed .step-number {
+            background: var(--secondary-green);
+            color: var(--white);
+        }
+
+        .step-label {
+            font-size: 0.85rem;
+            color: var(--medium-gray);
+            text-align: center;
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .time-slot {
+            padding: 1rem;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            background: var(--white);
+        }
+
+        .time-slot:hover {
+            border-color: var(--primary-burgundy);
+            background: var(--secondary-cream);
+        }
+
+        .time-slot.selected {
+            border-color: var(--primary-burgundy);
+            background: var(--primary-burgundy);
+            color: var(--white);
+        }
+
+        .time-slot.unavailable {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: var(--light-gray);
+        }
+
+        .service-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .service-card {
+            padding: 1.5rem;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            text-align: center;
+        }
+
+        .service-card:hover {
+            border-color: var(--primary-burgundy);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .service-card.selected {
+            border-color: var(--primary-burgundy);
+            background: var(--gradient-primary);
+            color: var(--white);
+        }
+
+        .service-card i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-weight: 500;
+        }
+
+        .calendar-day:hover:not(.disabled) {
+            border-color: var(--primary-burgundy);
+            background: var(--secondary-cream);
+        }
+
+        .calendar-day.selected {
+            border-color: var(--primary-burgundy);
+            background: var(--primary-burgundy);
+            color: var(--white);
+        }
+
+        .calendar-day.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .calendar-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .booking-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .step-label {
+                font-size: 0.75rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="logo.png" alt="HVR Photography Logo" style="height: 60px; width: auto;">
+            </a>
+
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html#home" class="nav-link">Home</a></li>
+                <li><a href="index.html#about" class="nav-link">About</a></li>
+                <li><a href="index.html#services" class="nav-link">Services</a></li>
+                <li><a href="index.html#gallery" class="nav-link">Gallery</a></li>
+                <li><a href="index.html#tools" class="nav-link active">Interactive Tools</a></li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="booking-container">
+        <h1 class="text-center">Book Your Free Consultation</h1>
+        <p class="text-center" style="max-width: 700px; margin: 1rem auto 2rem; color: var(--medium-gray);">
+            Schedule a virtual consultation to discuss your photography needs. We'll help you plan the perfect
+            photoshoot!
+        </p>
+
+        <div class="booking-card">
+            <!-- Step Indicator -->
+            <div class="step-indicator">
+                <div class="step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Service</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Date & Time</div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Your Details</div>
+                </div>
+                <div class="step" data-step="4">
+                    <div class="step-number">4</div>
+                    <div class="step-label">Confirmation</div>
+                </div>
+            </div>
+
+            <form id="bookingForm">
+                <!-- Step 1: Service Selection -->
+                <div class="form-step active" data-step="1">
+                    <h3>What service are you interested in?</h3>
+                    <div class="service-cards">
+                        <div class="service-card" data-service="maternity">
+                            <i class="fas fa-baby-carriage"></i>
+                            <h4>Maternity</h4>
+                        </div>
+                        <div class="service-card" data-service="housewarming">
+                            <i class="fas fa-home"></i>
+                            <h4>House Warming</h4>
+                        </div>
+                        <div class="service-card" data-service="ravivarma">
+                            <i class="fas fa-camera"></i>
+                            <h4>Ravi Varma</h4>
+                        </div>
+                        <div class="service-card" data-service="event">
+                            <i class="fas fa-users"></i>
+                            <h4>Event</h4>
+                        </div>
+                        <div class="service-card" data-service="studio">
+                            <i class="fas fa-user-tie"></i>
+                            <h4>Studio Portrait</h4>
+                        </div>
+                        <div class="service-card" data-service="couple">
+                            <i class="fas fa-heart"></i>
+                            <h4>Couple Session</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Date & Time Selection -->
+                <div class="form-step" data-step="2">
+                    <h3>Select your preferred date and time</h3>
+
+                    <div style="margin: 2rem 0;">
+                        <h4>Choose a Date</h4>
+                        <div class="calendar-header">
+                            <div>Sun</div>
+                            <div>Mon</div>
+                            <div>Tue</div>
+                            <div>Wed</div>
+                            <div>Thu</div>
+                            <div>Fri</div>
+                            <div>Sat</div>
+                        </div>
+                        <div class="calendar-grid" id="calendarGrid">
+                            <!-- Calendar days will be generated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div style="margin: 2rem 0;">
+                        <h4>Choose a Time Slot</h4>
+                        <div class="time-slots" id="timeSlots">
+                            <div class="time-slot" data-time="09:00">9:00 AM</div>
+                            <div class="time-slot" data-time="10:00">10:00 AM</div>
+                            <div class="time-slot" data-time="11:00">11:00 AM</div>
+                            <div class="time-slot" data-time="12:00">12:00 PM</div>
+                            <div class="time-slot" data-time="13:00">1:00 PM</div>
+                            <div class="time-slot" data-time="14:00">2:00 PM</div>
+                            <div class="time-slot" data-time="15:00">3:00 PM</div>
+                            <div class="time-slot" data-time="16:00">4:00 PM</div>
+                            <div class="time-slot" data-time="17:00">5:00 PM</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Contact Information -->
+                <div class="form-step" data-step="3">
+                    <h3>Your Contact Information</h3>
+
+                    <div class="form-group">
+                        <label for="fullName" class="form-label">Full Name *</label>
+                        <input type="text" id="fullName" name="fullName" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email Address *</label>
+                        <input type="email" id="email" name="email" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone" class="form-label">Phone Number *</label>
+                        <input type="tel" id="phone" name="phone" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes" class="form-label">Additional Notes (Optional)</label>
+                        <textarea id="notes" name="notes" class="form-textarea" rows="4"
+                            placeholder="Tell us more about your vision, preferred location, or any special requirements..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Step 4: Confirmation -->
+                <div class="form-step" data-step="4">
+                    <h3>Confirm Your Booking</h3>
+
+                    <div
+                        style="background: var(--secondary-cream); padding: 2rem; border-radius: var(--border-radius-lg); margin: 2rem 0;">
+                        <h4 style="margin-bottom: 1.5rem;">Booking Summary</h4>
+
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Service:</strong>
+                            <p id="summaryService" style="margin: 0.5rem 0; color: var(--medium-gray);">-</p>
+                        </div>
+
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Date & Time:</strong>
+                            <p id="summaryDateTime" style="margin: 0.5rem 0; color: var(--medium-gray);">-</p>
+                        </div>
+
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Contact:</strong>
+                            <p id="summaryContact" style="margin: 0.5rem 0; color: var(--medium-gray);">-</p>
+                        </div>
+                    </div>
+
+                    <div
+                        style="background: #E8F5E9; padding: 1.5rem; border-radius: var(--border-radius); border-left: 4px solid var(--secondary-green);">
+                        <p style="margin: 0;"><strong>✓ Free Consultation</strong></p>
+                        <p style="margin: 0.5rem 0 0; color: var(--medium-gray); font-size: 0.9rem;">This is a
+                            complimentary 30-minute virtual consultation to discuss your photography needs.</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="button-group">
+                    <button type="button" id="prevBtn" class="btn btn-outline" style="flex: 1;" disabled>
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button type="button" id="nextBtn" class="btn btn-primary" style="flex: 1;" disabled>
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button type="submit" id="submitBtn" class="btn btn-primary" style="flex: 1; display: none;">
+                        <i class="fas fa-check"></i> Confirm Booking
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Booking System Logic
+        let currentStep = 1;
+        const totalSteps = 4;
+        let bookingData = {
+            service: '',
+            date: '',
+            time: '',
+            fullName: '',
+            email: '',
+            phone: '',
+            notes: ''
+        };
+
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const bookingForm = document.getElementById('bookingForm');
+
+        // Initialize calendar
+        generateCalendar();
+
+        // Service selection
+        document.querySelectorAll('.service-card').forEach(card => {
+            card.addEventListener('click', function () {
+                document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                bookingData.service = this.dataset.service;
+                nextBtn.disabled = false;
+            });
+        });
+
+        // Date selection
+        function generateCalendar() {
+            const calendarGrid = document.getElementById('calendarGrid');
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+
+            // Get first day of month and total days
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            // Add empty cells for days before month starts
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day disabled';
+                calendarGrid.appendChild(emptyDay);
+            }
+
+            // Add days of month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = day;
+                dayElement.dataset.date = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+                // Disable past dates
+                const dayDate = new Date(currentYear, currentMonth, day);
+                if (dayDate < today) {
+                    dayElement.classList.add('disabled');
+                } else {
+                    dayElement.addEventListener('click', function () {
+                        document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
+                        this.classList.add('selected');
+                        bookingData.date = this.dataset.date;
+                        checkStep2Complete();
+                    });
+                }
+
+                calendarGrid.appendChild(dayElement);
+            }
+        }
+
+        // Time slot selection
+        document.querySelectorAll('.time-slot').forEach(slot => {
+            slot.addEventListener('click', function () {
+                if (!this.classList.contains('unavailable')) {
+                    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+                    this.classList.add('selected');
+                    bookingData.time = this.dataset.time;
+                    checkStep2Complete();
+                }
+            });
+        });
+
+        function checkStep2Complete() {
+            nextBtn.disabled = !(bookingData.date && bookingData.time);
+        }
+
+        // Navigation
+        nextBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                if (validateStep(currentStep)) {
+                    currentStep++;
+                    updateStep();
+                }
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStep();
+            }
+        });
+
+        function validateStep(step) {
+            if (step === 1 && !bookingData.service) {
+                alert('Please select a service');
+                return false;
+            }
+            if (step === 2 && (!bookingData.date || !bookingData.time)) {
+                alert('Please select both date and time');
+                return false;
+            }
+            if (step === 3) {
+                bookingData.fullName = document.getElementById('fullName').value;
+                bookingData.email = document.getElementById('email').value;
+                bookingData.phone = document.getElementById('phone').value;
+                bookingData.notes = document.getElementById('notes').value;
+
+                if (!bookingData.fullName || !bookingData.email || !bookingData.phone) {
+                    alert('Please fill in all required fields');
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function updateStep() {
+            // Update step indicators
+            document.querySelectorAll('.step').forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                if (index + 1 < currentStep) {
+                    step.classList.add('completed');
+                } else if (index + 1 === currentStep) {
+                    step.classList.add('active');
+                }
+            });
+
+            // Update form steps
+            document.querySelectorAll('.form-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.querySelector(`.form-step[data-step="${currentStep}"]`).classList.add('active');
+
+            // Update buttons
+            prevBtn.disabled = currentStep === 1;
+
+            if (currentStep === totalSteps) {
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = 'block';
+                updateSummary();
+            } else {
+                nextBtn.style.display = 'block';
+                submitBtn.style.display = 'none';
+                nextBtn.disabled = currentStep === 2 && (!bookingData.date || !bookingData.time);
+            }
+        }
+
+        function updateSummary() {
+            const serviceNames = {
+                maternity: 'Maternity Photography',
+                housewarming: 'House Warming Ceremony',
+                ravivarma: 'Ravi Varma Photoshoot',
+                event: 'Event Photography',
+                studio: 'Studio Portrait',
+                couple: 'Couple Session'
+            };
+
+            document.getElementById('summaryService').textContent = serviceNames[bookingData.service] || bookingData.service;
+            document.getElementById('summaryDateTime').textContent = `${bookingData.date} at ${bookingData.time}`;
+            document.getElementById('summaryContact').textContent = `${bookingData.fullName} | ${bookingData.email} | ${bookingData.phone}`;
+        }
+
+        // Form submission
+        bookingForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Store booking
+            const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+            bookings.push({
+                ...bookingData,
+                timestamp: new Date().toISOString(),
+                status: 'pending'
+            });
+            localStorage.setItem('bookings', JSON.stringify(bookings));
+
+            // Show success message
+            alert('🎉 Booking Confirmed!\n\nThank you for booking a consultation with HVR Photography Studio. We\'ll send you a confirmation email shortly with the virtual meeting link.\n\nWe look forward to discussing your photography needs!');
+
+            // Track event
+            if (typeof trackEvent === 'function') {
+                trackEvent('Booking', 'Submit', bookingData.service);
+            }
+
+            // Redirect to home
+            window.location.href = 'index.html#contact';
+        });
+    </script>
+</body>
+
+</html>

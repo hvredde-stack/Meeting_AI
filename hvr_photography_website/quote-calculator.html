@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Photography Package Quote Calculator - Get instant price estimates for your photography needs.">
+    <title>Quote Calculator | HVR Photography Studio</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap"
+        rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        .calculator-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .calculator-panel {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .quote-summary {
+            position: sticky;
+            top: 100px;
+        }
+
+        .option-group {
+            margin-bottom: 2.5rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .option-group:last-child {
+            border-bottom: none;
+        }
+
+        .option-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .option-card {
+            padding: 1.5rem 1rem;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            text-align: center;
+        }
+
+        .option-card:hover {
+            border-color: var(--primary-burgundy);
+            transform: translateY(-2px);
+        }
+
+        .option-card.selected {
+            border-color: var(--primary-burgundy);
+            background: var(--gradient-primary);
+            color: var(--white);
+        }
+
+        .option-card .price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-top: 0.5rem;
+            color: var(--primary-gold);
+        }
+
+        .option-card.selected .price {
+            color: var(--white);
+        }
+
+        .addon-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .addon-item:hover {
+            border-color: var(--primary-burgundy);
+            background: var(--secondary-cream);
+        }
+
+        .addon-item.selected {
+            border-color: var(--primary-burgundy);
+            background: var(--primary-burgundy);
+            color: var(--white);
+        }
+
+        .addon-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--primary-burgundy);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+        }
+
+        .addon-item.selected .addon-checkbox {
+            background: var(--white);
+        }
+
+        .addon-item.selected .addon-checkbox i {
+            color: var(--primary-burgundy);
+        }
+
+        .price-breakdown {
+            background: var(--secondary-cream);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            color: var(--medium-gray);
+        }
+
+        .price-row.total {
+            padding-top: 1rem;
+            border-top: 2px solid var(--light-gray);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-charcoal);
+            margin-top: 1rem;
+        }
+
+        .price-row.total .amount {
+            color: var(--primary-burgundy);
+        }
+
+        @media (max-width: 968px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quote-summary {
+                position: static;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="logo.png" alt="HVR Photography Logo" style="height: 60px; width: auto;">
+            </a>
+
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html#home" class="nav-link">Home</a></li>
+                <li><a href="index.html#about" class="nav-link">About</a></li>
+                <li><a href="index.html#services" class="nav-link">Services</a></li>
+                <li><a href="index.html#gallery" class="nav-link">Gallery</a></li>
+                <li><a href="index.html#tools" class="nav-link active">Interactive Tools</a></li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="calculator-container">
+        <h1 class="text-center">Photography Package Quote Calculator</h1>
+        <p class="text-center" style="max-width: 700px; margin: 1rem auto 0; color: var(--medium-gray);">
+            Get an instant estimate for your photography package. Customize your options to see pricing in real-time.
+        </p>
+
+        <div class="calculator-grid">
+            <!-- Options Panel -->
+            <div class="calculator-panel">
+                <!-- Photography Type -->
+                <div class="option-group">
+                    <h3><i class="fas fa-camera"></i> Photography Type</h3>
+                    <div class="option-cards">
+                        <div class="option-card" data-type="maternity" data-price="350">
+                            <i class="fas fa-baby-carriage" style="font-size: 2rem;"></i>
+                            <h4 style="margin: 0.5rem 0;">Maternity</h4>
+                            <div class="price">$350</div>
+                        </div>
+                        <div class="option-card" data-type="housewarming" data-price="450">
+                            <i class="fas fa-home" style="font-size: 2rem;"></i>
+                            <h4 style="margin: 0.5rem 0;">House Warming</h4>
+                            <div class="price">$450</div>
+                        </div>
+                        <div class="option-card" data-type="ravivarma" data-price="400">
+                            <i class="fas fa-camera" style="font-size: 2rem;"></i>
+                            <h4 style="margin: 0.5rem 0;">Ravi Varma</h4>
+                            <div class="price">$400</div>
+                        </div>
+                        <div class="option-card" data-type="event" data-price="600">
+                            <i class="fas fa-users" style="font-size: 2rem;"></i>
+                            <h4 style="margin: 0.5rem 0;">Event</h4>
+                            <div class="price">$600</div>
+                        </div>
+                        <div class="option-card" data-type="studio" data-price="250">
+                            <i class="fas fa-user-tie" style="font-size: 2rem;"></i>
+                            <h4 style="margin: 0.5rem 0;">Studio</h4>
+                            <div class="price">$250</div>
+                        </div>
+                        <div class="option-card" data-type="couple" data-price="300">
+                            <i class="fas fa-heart" style="font-size: 2rem;"></i>
+                            <h4 style="margin: 0.5rem 0;">Couple</h4>
+                            <div class="price">$300</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Duration -->
+                <div class="option-group">
+                    <h3><i class="fas fa-clock"></i> Session Duration</h3>
+                    <div class="option-cards">
+                        <div class="option-card" data-duration="1" data-price="0">
+                            <h4>1 Hour</h4>
+                            <div class="price">Base</div>
+                        </div>
+                        <div class="option-card" data-duration="2" data-price="150">
+                            <h4>2 Hours</h4>
+                            <div class="price">+$150</div>
+                        </div>
+                        <div class="option-card" data-duration="3" data-price="250">
+                            <h4>3 Hours</h4>
+                            <div class="price">+$250</div>
+                        </div>
+                        <div class="option-card" data-duration="4" data-price="350">
+                            <h4>4+ Hours</h4>
+                            <div class="price">+$350</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Number of Edited Photos -->
+                <div class="option-group">
+                    <h3><i class="fas fa-images"></i> Edited Photos</h3>
+                    <div class="option-cards">
+                        <div class="option-card" data-photos="25" data-price="0">
+                            <h4>25 Photos</h4>
+                            <div class="price">Base</div>
+                        </div>
+                        <div class="option-card" data-photos="50" data-price="100">
+                            <h4>50 Photos</h4>
+                            <div class="price">+$100</div>
+                        </div>
+                        <div class="option-card" data-photos="100" data-price="200">
+                            <h4>100 Photos</h4>
+                            <div class="price">+$200</div>
+                        </div>
+                        <div class="option-card" data-photos="unlimited" data-price="350">
+                            <h4>Unlimited</h4>
+                            <div class="price">+$350</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add-ons -->
+                <div class="option-group">
+                    <h3><i class="fas fa-plus-circle"></i> Add-ons</h3>
+
+                    <div class="addon-item" data-addon="prints" data-price="150">
+                        <div>
+                            <strong>Professional Prints</strong>
+                            <p style="margin: 0.25rem 0 0; font-size: 0.9rem; color: var(--medium-gray);">10 premium
+                                quality prints</p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <span class="price" style="font-size: 1rem;">+$150</span>
+                            <div class="addon-checkbox">
+                                <i class="fas fa-check" style="display: none;"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="addon-item" data-addon="album" data-price="300">
+                        <div>
+                            <strong>Photo Album</strong>
+                            <p style="margin: 0.25rem 0 0; font-size: 0.9rem; color: var(--medium-gray);">Premium
+                                leather-bound album</p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <span class="price" style="font-size: 1rem;">+$300</span>
+                            <div class="addon-checkbox">
+                                <i class="fas fa-check" style="display: none;"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="addon-item" data-addon="video" data-price="400">
+                        <div>
+                            <strong>Video Highlights</strong>
+                            <p style="margin: 0.25rem 0 0; font-size: 0.9rem; color: var(--medium-gray);">3-5 minute
+                                cinematic video</p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <span class="price" style="font-size: 1rem;">+$400</span>
+                            <div class="addon-checkbox">
+                                <i class="fas fa-check" style="display: none;"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="addon-item" data-addon="rush" data-price="200">
+                        <div>
+                            <strong>Rush Delivery</strong>
+                            <p style="margin: 0.25rem 0 0; font-size: 0.9rem; color: var(--medium-gray);">Photos ready
+                                in 3 days</p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <span class="price" style="font-size: 1rem;">+$200</span>
+                            <div class="addon-checkbox">
+                                <i class="fas fa-check" style="display: none;"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="addon-item" data-addon="assistant" data-price="150">
+                        <div>
+                            <strong>Second Photographer</strong>
+                            <p style="margin: 0.25rem 0 0; font-size: 0.9rem; color: var(--medium-gray);">Additional
+                                coverage angles</p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <span class="price" style="font-size: 1rem;">+$150</span>
+                            <div class="addon-checkbox">
+                                <i class="fas fa-check" style="display: none;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quote Summary -->
+            <div class="quote-summary">
+                <div class="calculator-panel">
+                    <h3>Your Quote</h3>
+
+                    <div class="price-breakdown">
+                        <div class="price-row">
+                            <span>Base Package:</span>
+                            <span id="basePrice">$0</span>
+                        </div>
+                        <div class="price-row">
+                            <span>Duration:</span>
+                            <span id="durationPrice">$0</span>
+                        </div>
+                        <div class="price-row">
+                            <span>Edited Photos:</span>
+                            <span id="photosPrice">$0</span>
+                        </div>
+                        <div class="price-row">
+                            <span>Add-ons:</span>
+                            <span id="addonsPrice">$0</span>
+                        </div>
+                        <div class="price-row total">
+                            <span>Total Estimate:</span>
+                            <span class="amount" id="totalPrice">$0</span>
+                        </div>
+                    </div>
+
+                    <div
+                        style="background: #FFF3E0; padding: 1.5rem; border-radius: var(--border-radius); margin-bottom: 1.5rem; border-left: 4px solid var(--primary-gold);">
+                        <p style="margin: 0; font-size: 0.9rem;"><strong>💡 Note:</strong> This is an estimated quote.
+                            Final pricing may vary based on specific requirements and location.</p>
+                    </div>
+
+                    <button id="requestQuoteBtn" class="btn btn-primary" style="width: 100%; margin-bottom: 0.75rem;"
+                        disabled>
+                        <i class="fas fa-envelope"></i> Request Detailed Quote
+                    </button>
+                    <button onclick="window.location.href='booking.html'" class="btn btn-secondary"
+                        style="width: 100%;">
+                        <i class="fas fa-calendar"></i> Book Consultation
+                    </button>
+
+                    <div id="selectedSummary"
+                        style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--light-gray); display: none;">
+                        <h4 style="margin-bottom: 1rem;">Selected Options:</h4>
+                        <ul id="summaryList" style="list-style: none; color: var(--medium-gray); font-size: 0.9rem;">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Quote Calculator Logic
+        let quoteData = {
+            type: null,
+            typePrice: 0,
+            duration: null,
+            durationPrice: 0,
+            photos: null,
+            photosPrice: 0,
+            addons: [],
+            addonsPrice: 0
+        };
+
+        // Photography type selection
+        document.querySelectorAll('.option-card[data-type]').forEach(card => {
+            card.addEventListener('click', function () {
+                document.querySelectorAll('.option-card[data-type]').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                quoteData.type = this.dataset.type;
+                quoteData.typePrice = parseInt(this.dataset.price);
+                updateQuote();
+            });
+        });
+
+        // Duration selection
+        document.querySelectorAll('.option-card[data-duration]').forEach(card => {
+            card.addEventListener('click', function () {
+                document.querySelectorAll('.option-card[data-duration]').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                quoteData.duration = this.dataset.duration;
+                quoteData.durationPrice = parseInt(this.dataset.price);
+                updateQuote();
+            });
+        });
+
+        // Photos selection
+        document.querySelectorAll('.option-card[data-photos]').forEach(card => {
+            card.addEventListener('click', function () {
+                document.querySelectorAll('.option-card[data-photos]').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                quoteData.photos = this.dataset.photos;
+                quoteData.photosPrice = parseInt(this.dataset.price);
+                updateQuote();
+            });
+        });
+
+        // Add-ons selection
+        document.querySelectorAll('.addon-item').forEach(item => {
+            item.addEventListener('click', function () {
+                this.classList.toggle('selected');
+                const checkbox = this.querySelector('.addon-checkbox i');
+                const addon = this.dataset.addon;
+                const price = parseInt(this.dataset.price);
+
+                if (this.classList.contains('selected')) {
+                    checkbox.style.display = 'block';
+                    quoteData.addons.push({ name: addon, price: price });
+                } else {
+                    checkbox.style.display = 'none';
+                    quoteData.addons = quoteData.addons.filter(a => a.name !== addon);
+                }
+
+                quoteData.addonsPrice = quoteData.addons.reduce((sum, addon) => sum + addon.price, 0);
+                updateQuote();
+            });
+        });
+
+        function updateQuote() {
+            // Update price breakdown
+            document.getElementById('basePrice').textContent = `$${quoteData.typePrice}`;
+            document.getElementById('durationPrice').textContent = `$${quoteData.durationPrice}`;
+            document.getElementById('photosPrice').textContent = `$${quoteData.photosPrice}`;
+            document.getElementById('addonsPrice').textContent = `$${quoteData.addonsPrice}`;
+
+            const total = quoteData.typePrice + quoteData.durationPrice + quoteData.photosPrice + quoteData.addonsPrice;
+            document.getElementById('totalPrice').textContent = `$${total}`;
+
+            // Enable request quote button if at least type is selected
+            document.getElementById('requestQuoteBtn').disabled = !quoteData.type;
+
+            // Update summary
+            if (quoteData.type) {
+                const summaryList = document.getElementById('summaryList');
+                const selectedSummary = document.getElementById('selectedSummary');
+                summaryList.innerHTML = '';
+
+                const typeNames = {
+                    maternity: 'Maternity Photography',
+                    housewarming: 'House Warming',
+                    ravivarma: 'Ravi Varma Photoshoot',
+                    event: 'Event Photography',
+                    studio: 'Studio Portrait',
+                    couple: 'Couple Session'
+                };
+
+                summaryList.innerHTML += `<li>✓ ${typeNames[quoteData.type]}</li>`;
+                if (quoteData.duration) summaryList.innerHTML += `<li>✓ ${quoteData.duration} hour session</li>`;
+                if (quoteData.photos) summaryList.innerHTML += `<li>✓ ${quoteData.photos} edited photos</li>`;
+                quoteData.addons.forEach(addon => {
+                    const addonNames = {
+                        prints: 'Professional Prints',
+                        album: 'Photo Album',
+                        video: 'Video Highlights',
+                        rush: 'Rush Delivery',
+                        assistant: 'Second Photographer'
+                    };
+                    summaryList.innerHTML += `<li>✓ ${addonNames[addon.name]}</li>`;
+                });
+
+                selectedSummary.style.display = 'block';
+            }
+
+            // Track event
+            if (typeof trackEvent === 'function' && total > 0) {
+                trackEvent('Quote Calculator', 'Calculate', `$${total}`);
+            }
+        }
+
+        // Request detailed quote
+        document.getElementById('requestQuoteBtn').addEventListener('click', function () {
+            const total = quoteData.typePrice + quoteData.durationPrice + quoteData.photosPrice + quoteData.addonsPrice;
+
+            // Store quote request
+            const quotes = JSON.parse(localStorage.getItem('quoteRequests') || '[]');
+            quotes.push({
+                ...quoteData,
+                total: total,
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem('quoteRequests', JSON.stringify(quotes));
+
+            alert(`Quote Request Saved!\n\nEstimated Total: $${total}\n\nWe'll send you a detailed quote via email. You can also book a free consultation to discuss your needs in detail.`);
+
+            if (typeof trackEvent === 'function') {
+                trackEvent('Quote Calculator', 'Request Quote', `$${total}`);
+            }
+
+            // Redirect to contact
+            window.location.href = 'index.html#contact';
+        });
+    </script>
+</body>
+
+</html>
